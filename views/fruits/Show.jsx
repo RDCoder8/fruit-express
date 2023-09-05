@@ -14,6 +14,10 @@ const React = require('react')
                 :
                     "naw, this ain't a munch."
             }
+            <br />
+            <img src={fruit.image} width={300} height={300}/>
+            <br />
+            <a href='/fruits'>Back</a>
           </div>
          );
         }

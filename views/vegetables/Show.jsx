@@ -8,9 +8,12 @@ const React = require('react')
                 Show Page
             </h1>
             The {vegetables.name} is {vegetables.color}.
-            And says "{vegetables.pun}"
-            <br></br>
+            <br />
+            It {vegetables.readyToEat ? "is ready to be eaten" : "looks a bit funky"} and says "{vegetables.pun}"
+            <br/>
             <img src={vegetables.image} width={300} height={300}/>
+            <br />
+            <a href='/vegetables'>Back</a>
           </div>
          );
         }
