@@ -13,7 +13,7 @@ class Index extends React.Component {
           {vegetables.map((vegetable, i) => {
             return (
               <li key={i}>
-                The <a href={`/vegetables/${i}`}>{vegetable.name}</a> is{" "}
+                The <a href={`/vegetables/${vegetable._id}`}>{vegetable.name}</a> is{" "}
                 {vegetable.color} <br></br>
                 and says "{vegetable.pun}"
                 <br />
