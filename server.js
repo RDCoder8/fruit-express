@@ -3,7 +3,7 @@ const express = require('express');
 const app = express();
 const PORT = process.env.PORT || 3000
 const Fruit = require('./models/fruit')
-const vegetables = require('./models/vegetables')
+const Vegetable = require('./models/vegetable')
 const mongoose = require('mongoose')
 
 ////////Database Collection
@@ -89,8 +89,13 @@ app.get('/fruits/:id', async (req, res) => {
 });
 
 ///////Vegetable Index Route
-app.get('/vegetables', (req, res) => {
-    res.render('./vegetables/Index', { vegetables })
+app.get('/vegetables', async (req, res) => {
+    try {
+        const foundVegetables = await Vegetable.find({})
+        res.render('./vegetables/Index', { vegetables: foundVegetables })
+    } catch (error) {
+        res.status(400).send(error)
+    }
 });
 
 ///////Vegetable New Route
