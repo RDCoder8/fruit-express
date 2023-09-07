@@ -1,8 +1,20 @@
+require("dotenv").config()
 const express = require('express');
 const app = express();
 const PORT = process.env.PORT || 3000
-const fruits = require('./models/fruits')
+const Fruit = require('./models/fruit')
 const vegetables = require('./models/vegetables')
+const mongoose = require('mongoose')
+
+////////Database Collection
+mongoose.connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+  });
+  mongoose.connection.once("open", () => {
+    console.log("Hacked into the mainframe")
+  })
+  ////////////////////////
 
 app.set("view engine", 'jsx')
 //Default is to look inside the views folder
@@ -21,9 +33,15 @@ app.use((req, res, next) => {
 app.use(express.urlencoded({extended: false}))
 
 ///////Fruit Index Route
-app.get('/fruits', (req, res) => {
-    // console.log('Index controller')
-    res.render('./fruits/Index', { fruits })
+app.get('/fruits', async (req, res) => {
+    try {
+        const foundFruits = await Fruit.find({})
+        // console.log(foundFruits)
+        res.status(200).render('./fruits/Index', { fruits: foundFruits })
+    } catch (error) {
+        res.status(418).send(error)
+    }
+    
 });
 
 ///////Fruit New Route
@@ -36,27 +54,38 @@ app.get('/fruits/new', (req, res) => {
 ///////Fruit Update Route
 
 ///////Fruit Create Route
-app.post('/fruits', (req, res) => {
-    // if(req.body.readyToEat === 'on'){ //if checked, req.body.readyToEat is set to 'on'
+app.post('/fruits', async (req, res) => {
+    try {
+        // if(req.body.readyToEat === 'on'){ //if checked, req.body.readyToEat is set to 'on'
     //     req.body.readyToEat = true; //do some data correction
     // } else { //if not checked, req.body.readyToEat is undefined
     //     req.body.readyToEat = false; //do some data correction
     // }
     req.body.readyToEat = req.body.readyToEat === 'on'
-    fruits.push(req.body)
-    // console.log(fruits)
-    res.redirect('/fruits') //send user back to /fruits
+
+    const createdFruit = await Fruit.create(req.body)
+    res.status(201).send(createdFruit)
+    } catch (error) {
+        res.status(400).send(error)
+    }
+    
 })
 
 ///////Fruit Edit Route
 
 //Fruit Show Route
-app.get('/fruits/:id', (req, res) => {
-    //second param of the render method must be an object
+app.get('/fruits/:id', async (req, res) => {
+    try {
+        const foundFruit = await Fruit.findById(req.params.id)
+        //second param of the render method must be an object
     res.render('./fruits/Show', {
         //there will be a variable available inside the jsx file called fruit, its value is fruits[req.params.indexOfFruitArray]
-        fruit: fruits[req.params.id]
+        fruit: foundFruit
     })
+    } catch (error) {
+        res.status(400).send(error)
+    }
+    
 });
 
 ///////Vegetable Index Route
@@ -77,7 +106,7 @@ app.get('/vegetables/new', (req, res) => {
 app.post('/vegetables', (req, res) => {
     req.body.readyToEat = req.body.readyToEat === 'on'
     vegetables.push(req.body)
-    res.redirect('/vegetables') //send user back to /fruits
+    res.redirect('/vegetables') //send user back to /vegetabless
 })
 
 ///////Vegetable Edit Route
