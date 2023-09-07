@@ -122,11 +122,16 @@ app.post('/vegetables', async (req, res) => {
 ///////Vegetable Edit Route
 
 //Vegetable Show Route
-app.get('/vegetables/:id', (req, res) => {
-    //second param of the render method must be an object
-    res.render('./vegetables/Show', {
-        vegetables : vegetables[req.params.id]
+app.get('/vegetables/:id', async (req, res) => {
+    try {
+        const foundVegetable = await Vegetable.findById(req.params.id)
+        res.render('./vegetables/Show', {
+        vegetables : foundVegetable
     })
+    } catch (error) {
+        res.status(400). send(error)
+    }
+    
 });
 
 app.listen(PORT, () => {
