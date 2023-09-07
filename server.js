@@ -108,10 +108,15 @@ app.get('/vegetables/new', (req, res) => {
 ///////Vegetable Update Route
 
 ///////Vegetable Create Route
-app.post('/vegetables', (req, res) => {
-    req.body.readyToEat = req.body.readyToEat === 'on'
-    vegetables.push(req.body)
-    res.redirect('/vegetables') //send user back to /vegetabless
+app.post('/vegetables', async (req, res) => {
+    try {
+        req.body.readyToEat = req.body.readyToEat === 'on'
+        const createdVegetable = await Vegetable.create(req.body)
+        res.status(201).send(createdVegetable)
+    } catch (error) {
+        res.status(400).send(error)
+    }
+    
 })
 
 ///////Vegetable Edit Route
