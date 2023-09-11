@@ -5,6 +5,7 @@ const PORT = process.env.PORT || 3000
 const Fruit = require('./models/fruit')
 const Vegetable = require('./models/vegetable')
 const mongoose = require('mongoose')
+const methodOverride = require('method-override')
 
 ////////Database Collection
 mongoose.connect(process.env.MONGO_URI, {
@@ -22,15 +23,50 @@ app.set("view engine", 'jsx')
 const jsxViewEngine = require('jsx-view-engine')
 app.engine("jsx", jsxViewEngine())
 
+//CSS Import
+//Serves static files CSS
+app.use(express.static("public"))
+
 ///////Middleware
 app.use((req, res, next) => {
     // console.log('Middleware: I run for all routes, 1');
     next();
 });
 
+//We use a mongoose model to perform CRUD operations
 //By implementing the line below , we now have access to the req.body.
 //Which is the parsed formData from the form request
 app.use(express.urlencoded({extended: false}))
+//after app has been defined
+//use methodOverride.  We'll be adding a query parameter to our delete form named _method
+app.use(methodOverride('_method'));
+
+//Seed Route to put in data when you initally start
+app.get('/fruits/seed', async (req, res) => {
+    try {
+        await Fruit.create([
+                {
+                    name:'grapefruit',
+                    color:'pink',
+                    readyToEat:true
+                },
+                {
+                    name:'grape',
+                    color:'purple',
+                    readyToEat:false
+                },
+                {
+                    name:'avocado',
+                    color:'green',
+                    readyToEat:true
+                }
+            ])
+            res.redirect("/fruits")
+    } catch (error) {
+        res.status(400).send(error)
+    }
+})
+
 
 ///////Fruit Index Route
 app.get('/fruits', async (req, res) => {
@@ -50,8 +86,35 @@ app.get('/fruits/new', (req, res) => {
 })
 
 ///////Fruit Delete Route
+app.delete('/fruits/:id', async (req, res) => {
+    try {
+        //we are getting is id from the request parameters
+        await Fruit.findByIdAndDelete(req.params.id)
+        res.status(200).redirect("/fruits")
+    } catch (error) {
+        res.status(400).send(error)
+    }
+    //this was here to test the route.
+    //res.send('deleting...')
+})
 
 ///////Fruit Update Route
+app.put('/fruits/:id', async (req, res) => {
+    try {
+        req.body.readyToEat = req.body.readyToEat === 'on'
+        const updatedFruit = await Fruit.findByIdAndUpdate(
+            //Id gotten from the url
+            req.params.id, 
+            //the body from the form
+            req.body, 
+            //prevent delay in update
+            {new: true})
+            console.log(updatedFruit)
+        res.redirect(`/fruits/${req.params.id}`);
+    } catch (error) {
+        res.status(400).send(error)
+    }
+})
 
 ///////Fruit Create Route
 app.post('/fruits', async (req, res) => {
@@ -72,6 +135,15 @@ app.post('/fruits', async (req, res) => {
 })
 
 ///////Fruit Edit Route
+app.get('/fruits/:id/edit', async (req, res)=>{
+    try {
+        //find the document in the database and then update it
+        const foundFruit = await Fruit.findById(req.params.id)
+        res.render("./fruits/Edit", {fruit: foundFruit})
+    } catch (error) {
+        res.status(400).send(error)
+    }
+})
 
 //Fruit Show Route
 app.get('/fruits/:id', async (req, res) => {
