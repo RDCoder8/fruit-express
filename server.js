@@ -206,6 +206,12 @@ app.get('/vegetables/:id', async (req, res) => {
     
 });
 
+//Catch All Route
+
+app.get("*", (req, res) => {
+    res.redirect("/fruits")
+})
+
 app.listen(PORT, () => {
     console.log(`The government is listening on port ${PORT}`);
 });
