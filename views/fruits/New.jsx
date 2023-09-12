@@ -4,10 +4,7 @@ const DefaultLayout = require('../layout/Default')
 class New extends React.Component {
   render() {
     return (
-      <DefaultLayout>
-        <h1>
-            New Fruit Page
-        </h1>
+      <DefaultLayout title='New Fruit Page'>
         <form action="/fruits" method='POST'>
             Name: <input type='text' name='name'/> <br />
             Color: <input type='text' name='color'/> <br />

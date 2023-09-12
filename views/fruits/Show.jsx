@@ -1,12 +1,10 @@
 const React = require('react')
+const DefaultLayout = require('../layout/Default')
     class Show extends React.Component {
        render () {
         const fruit = this.props.fruit
         return (
-          <div>
-            <h1>
-                Show Page
-            </h1>
+          <DefaultLayout title='Show Page'>
             The {fruit.name} is {fruit.color}.
             And {
                 fruit.readyToEat ?
@@ -18,7 +16,7 @@ const React = require('react')
             <img src={fruit.image} width={300} height={300} alt='Fruit Image'/>
             <br />
             <a href='/fruits'>Back</a>
-          </div>
+          </DefaultLayout>
          );
         }
      }
